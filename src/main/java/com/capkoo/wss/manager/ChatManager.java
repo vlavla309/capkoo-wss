@@ -40,6 +40,8 @@ public class ChatManager {
 
 
   public void addClient(ServerWebSocket socket) {
+
+
     String roomName = socket.path().split("/",1)[0];
     if(roomName == null) {
       roomName = "robby";
@@ -48,6 +50,7 @@ public class ChatManager {
     ChatRoom chatRoom = this.getChatRoomByName(roomName);
     chatRoom.addChatClient(socket);
 
+    socket.handler(buffer -> this.recieveMessage(socket, buffer));
   }
 
 

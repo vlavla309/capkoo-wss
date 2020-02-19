@@ -14,7 +14,6 @@ public class MainVerticle extends AbstractVerticle {
 
   @Override
   public void start() throws Exception {
-
     HttpServer server = vertx.createHttpServer();
     server.webSocketHandler(WsHandler::handle);
     server.listen(8080);

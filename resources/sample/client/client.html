@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script>
+    var sock = null;
+
+    function connect() {
+      var roomName = document.querySelector("[name='room_name']").value;
+
+      sock = new WebSocket('ws://localhost:8080/'+roomName);
+      sock.onopen = function() {
+        console.log("Connected!!");
+      }
+
+      sock.onmessage = function(receive) {
+        var message_view = document.querySelector("#message_view");
+
+        message_view.value += receive.data + "\n";
+      }
+
+      document.querySelector("[name='room_name']").readonly="readonly";
+      document.querySelector("#chatLayer").style.display = "block";
+    }
+
+
+    function send() {
+      var input = document.querySelector("#message");
+      var message = input.value;
+
+      sock.send(message);
+      input.value = "";
+    }
+  </script>
+</head>
+<body>
+<input name="room_name" type='text'/>
+<button type="button" onclick="connect();"> 접속 </button>
+
+<div id="chatLayer">
+  <textarea id="message_view" readonly></textarea> <br/>
+  <input type="text" id="message"> <button type="button" onclick="send();">전송</button>
+</div>
+</body>
+</html>
