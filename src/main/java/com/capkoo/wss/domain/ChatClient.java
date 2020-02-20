@@ -1,10 +1,13 @@
-package com.capkoo.wss.manager;
+package com.capkoo.wss.domain;
 
+import com.capkoo.wss.dto.Message;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.http.WebSocket;
 
 public class ChatClient {
   private String name;
+  private ChatRoom chatRoom;
+  private String status;
   private ServerWebSocket socket;
 
   public ChatClient(ServerWebSocket socket) {
@@ -28,8 +31,29 @@ public class ChatClient {
     this.socket = socket;
   }
 
-  public void sendMessage(String message) {
-    this.socket.writeTextMessage(message);
+  public String getStatus() {
+    return status;
+  }
+
+  public ChatRoom getChatRoom() {
+    return chatRoom;
+  }
+
+  public void setChatRoom(ChatRoom chatRoom) {
+    this.chatRoom = chatRoom;
+  }
+
+  public void setStatus(String status) {
+    this.status = status;
+  }
+
+  public boolean sendMessage(Message message) {
+    if(! this.socket.isClosed()) {
+      this.socket.writeTextMessage(message.toJson());
+      return true;
+    }
+
+    return false;
   }
 
   @Override

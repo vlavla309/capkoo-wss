@@ -6,4 +6,7 @@ public enum MessageType {
   SYSTEM,
   CLIENT,
   SERVER,
+  WELCOME,
+  ;
+
 }

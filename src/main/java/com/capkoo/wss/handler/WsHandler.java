@@ -7,6 +7,6 @@ public class WsHandler {
   private final static ChatManager chatManager = new ChatManager();
 
   public static void handle(ServerWebSocket ws) {
-    chatManager.addClient(ws);
+    chatManager.welcome(ws);
   }
 }

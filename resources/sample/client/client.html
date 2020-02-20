@@ -4,44 +4,83 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <script src="ChatClient.js"></script>
   <script>
-    var sock = null;
+    var chatClient = null;
+    
 
     function connect() {
-      var roomName = document.querySelector("[name='room_name']").value;
+      const host = document.querySelector("input[name='host']").value;
+      const roomName = document.querySelector("input[name='room_name']").value;
+      const clientName = document.querySelector("input[name='client_name']").value;
 
-      sock = new WebSocket('ws://localhost:8080/'+roomName);
-      sock.onopen = function() {
-        console.log("Connected!!");
-      }
+      chatClient = new ChatClient({
+        "host": host,
+        "roomName": roomName,
+        "clientName": clientName,
+        "onConnect" : onConnect,
+        "onReceive" : onReceive
+      });
 
-      sock.onmessage = function(receive) {
-        var message_view = document.querySelector("#message_view");
+      chatClient.connect();
+    }
 
-        message_view.value += receive.data + "\n";
-      }
 
-      document.querySelector("[name='room_name']").readonly="readonly";
+    function onConnect() {
+      chatClient.requestJoinChat();
+
+      document.querySelector("input[name='host']").disabled ="true";
+      document.querySelector("input[name='room_name']").disabled="true";
+      document.querySelector("input[name='client_name']").disabled="true";
       document.querySelector("#chatLayer").style.display = "block";
+    }
+
+
+    function onReceive(message) {
+      console.log(message);
+      
+      let message_view = document.querySelector("#message_view");
+
+      message_view.value += message.sender + ": " + message.data.text + "\n";
     }
 
 
     function send() {
       var input = document.querySelector("#message");
-      var message = input.value;
+      var text = input.value;
 
-      sock.send(message);
+      chatClient.sendClientMessage(text);
       input.value = "";
     }
   </script>
+
+
+<style>
+  #message_view{
+    width: 600px;
+    height: 400px;
+  }
+</style>
 </head>
 <body>
-<input name="room_name" type='text'/>
-<button type="button" onclick="connect();"> 접속 </button>
+  <input name="host" type='text' value="ws://localhost:8080"/>
+  <input name="room_name" type='text' placeholder="방이름"/>
+  <input name="client_name" type='text' placeholder="닉네임"/>
+  <button type="button" onclick="connect();"> 접속 </button>
 
-<div id="chatLayer">
+<div id="chatLayer" style="display: none;">
   <textarea id="message_view" readonly></textarea> <br/>
-  <input type="text" id="message"> <button type="button" onclick="send();">전송</button>
+  <form name="frm_send">
+    <input type="text" id="message"> <button type="button" onclick="send();">전송</button>
+    <button type="submit" style="display: none;"></button>
+  </form>
+  <script>
+    frm = document.frm_send;
+    frm.onsubmit = function(evt) {
+      evt.preventDefault();
+      send();
+    }
+  </script>
 </div>
 </body>
 </html>

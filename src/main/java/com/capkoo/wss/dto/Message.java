@@ -2,16 +2,20 @@ package com.capkoo.wss.dto;
 
 import io.vertx.core.json.Json;
 
+import java.util.Map;
+
 public class Message {
   private MessageType type;
   private String sender;
-  private String message;
+  private Map data;
 
 
-  public Message(MessageType type, String sender, String message) {
+  public Message() {}
+
+  public Message(MessageType type, String sender, Map data) {
     this.type = type;
     this.sender = sender;
-    this.message = message;
+    this.data = data;
   }
 
 
@@ -31,12 +35,12 @@ public class Message {
     this.sender = sender;
   }
 
-  public String getMessage() {
-    return message;
+  public Map getData() {
+    return data;
   }
 
-  public void setMessage(String message) {
-    this.message = message;
+  public void setData(Map data) {
+    this.data = data;
   }
 
 
@@ -50,7 +54,7 @@ public class Message {
     return "Message{" +
       "type=" + type +
       ", sender='" + sender + '\'' +
-      ", message='" + message + '\'' +
+      ", data='" + data + '\'' +
       '}';
   }
 }

@@ -1,9 +1,9 @@
-package com.capkoo.wss.manager;
+package com.capkoo.wss.domain;
 
+import com.capkoo.wss.dto.Message;
 import io.vertx.core.http.ServerWebSocket;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class ChatRoom {
   private String name;
@@ -18,27 +18,26 @@ public class ChatRoom {
     return chatClients;
   }
 
+
   public void setChatClients(HashMap chatClients) {
     this.chatClients = chatClients;
   }
 
 
-  public ChatRoom addChatClient(ServerWebSocket socket) {
-    if(! this.isExistClient(socket.textHandlerID())) {
-      this.chatClients.put(socket.textHandlerID(), new ChatClient(socket));
+  public ChatRoom addChatClient(ChatClient chatClient) {
+    if(! this.isExistClient(chatClient.getSocket().textHandlerID())) {
+      this.chatClients.put(chatClient.getSocket().textHandlerID(), chatClient);
     }
+
+    chatClient.setChatRoom(this);
 
     return this;
   }
 
 
+
   public boolean isExistClient(String id){
     return this.chatClients.containsKey(id);
-  }
-
-
-  public ChatClient getClientByHandlerId(String id) {
-    return this.chatClients.get(id);
   }
 
 
@@ -47,10 +46,16 @@ public class ChatRoom {
   }
 
 
-  public void sendMessage(String message, ServerWebSocket senderSocket) {
+  public boolean sendMessage(Message message, ChatClient sender) {
     this.chatClients.forEach((id, chatClient) -> {
-        chatClient.sendMessage(message);
+      boolean res = chatClient.sendMessage(message);
+
+      if(! res) {
+        this.removeChatClient(chatClient);
+      }
     });
+
+    return true;
   }
 
   @Override
